@@ -1,5 +1,6 @@
 import json
 import time
+import pdb
 from operator import itemgetter
 
 voxel_size = 10
@@ -20,6 +21,7 @@ def voxel_to_krunk(voxel):
     return newthing
 
 def merge_krunk_obj(objs, start_time):
+    global voxel_size
     
     #merge up
     print('Merging Y layer')
@@ -44,14 +46,22 @@ def merge_krunk_obj(objs, start_time):
         objs_merged = 0
         for obj in objs: 
             #voxel_right = get_obj_index(objs, [obj['p'][0] + obj['s'][0], obj['p'][1], obj['p'][2]])
-            voxel_right = bsearch_obj_index(objs, [obj['p'][0] + obj['s'][0], obj['p'][1], obj['p'][2]])
-            if(voxel_right != -1):
+            search_pos = obj['p'][0]
+            search_pos += voxel_size
+            voxel_right = bsearch_obj_index(objs, [search_pos, obj['p'][1], obj['p'][2]])
+            while(voxel_right != -1):
                 obj_right = objs[voxel_right]
                 if(obj_right['s'][1]  == obj['s'][1]): #make sure objs are same height before merging in x direction
                     obj['s'][0] += obj_right['s'][0]
                     obj['p'][0] += int(obj_right['s'][0]/2) #adjust x position to account for the increase in size
                     objs.pop(voxel_right)
                     objs_merged += 1
+                else:
+                    break
+                 
+                search_pos += voxel_size
+                voxel_right = bsearch_obj_index(objs, [search_pos, obj['p'][1], obj['p'][2]])
+                
         if(objs_merged == 0):
             break
         print('    {} objects merged'.format(objs_merged))
@@ -65,14 +75,26 @@ def merge_krunk_obj(objs, start_time):
         objs_merged = 0
         for obj in objs: 
             #voxel_forward = get_obj_index(objs, [obj['p'][0], obj['p'][1], obj['p'][2] + obj['s'][2]])
-            voxel_forward = bsearch_obj_index(objs, [obj['p'][0], obj['p'][1], obj['p'][2] + obj['s'][2]])
-            if(voxel_forward != -1):
-                obj_forward = objs[voxel_forward]
+            search_pos = obj['p'][2]
+            search_pos += voxel_size
+            voxel_forward = bsearch_obj_index(objs, [obj['p'][0], obj['p'][1], search_pos])
+            while(voxel_forward != -1):
+            #if(voxel_forward != -1):
+                if(obj['p'][0] == 210 and obj['p'][2] >100 and obj['p'][1] == 50):
+                    pdb.set_trace()
+                    
+                obj_foward = objs[voxel_forward]
                 if(obj_forward['s'][1]  == obj['s'][1] and obj_forward['s'][0] == obj['s'][0]): #make sure objs are same height and width before merging in z direction
                     obj['s'][2] += obj_forward['s'][2]
                     obj['p'][2] += int(obj_forward['s'][2]/2) #adjust z position to account for the increase in size
                     objs.pop(voxel_forward)
                     objs_merged += 1
+                else:
+                    break
+                    
+                search_pos += voxel_size
+                voxel_forward = bsearch_obj_index(objs, [obj['p'][0], obj['p'][1], search_pos])
+                
         if(objs_merged == 0):
             break
         print('    {} objects merged'.format(objs_merged))
@@ -106,11 +128,11 @@ def bsearch_obj_index(objs, pos):
             return -1
         
         guess_index = int((min+max)/2)
-        guess_pos = objs[guess_index]['p']
+        guess_pos = objs[guess_index][ob'p']
     
     return guess_index
     
-infile = 'voxels.json'
+infile = 'torus_simple.json'
 outfile = 'voxelmap.txt'
 obj_count = 0
 start_time = time.time()
