@@ -83,7 +83,7 @@ def merge_krunk_obj(objs, start_time):
                 if(obj['p'][0] == 210 and obj['p'][2] >100 and obj['p'][1] == 50):
                     pdb.set_trace()
                     
-                obj_foward = objs[voxel_forward]
+                obj_forward = objs[voxel_forward]
                 if(obj_forward['s'][1]  == obj['s'][1] and obj_forward['s'][0] == obj['s'][0]): #make sure objs are same height and width before merging in z direction
                     obj['s'][2] += obj_forward['s'][2]
                     obj['p'][2] += int(obj_forward['s'][2]/2) #adjust z position to account for the increase in size
@@ -128,11 +128,11 @@ def bsearch_obj_index(objs, pos):
             return -1
         
         guess_index = int((min+max)/2)
-        guess_pos = objs[guess_index][ob'p']
+        guess_pos = objs[guess_index]['p']
     
     return guess_index
     
-infile = 'torus_simple.json'
+infile = 'voxels.json'
 outfile = 'voxelmap.txt'
 obj_count = 0
 start_time = time.time()
